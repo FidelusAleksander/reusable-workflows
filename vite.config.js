@@ -12,7 +12,7 @@ export default defineConfig({
       provider: 'v8',
       reporter: ['text', 'lcov', 'html'],
       include: ['src/**/*.{js,jsx}'],
-      exclude: ['src/test/**', 'src/main.jsx'],
+      exclude: ['src/test/**', 'src/main.jsx', 'src/branding/brand.js'],
     },
   },
 })

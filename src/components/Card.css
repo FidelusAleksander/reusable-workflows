@@ -31,7 +31,7 @@
   position: absolute;
   inset: 0;
   backface-visibility: hidden;
-  border-radius: 12px;
+  border-radius: 6px;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -40,22 +40,22 @@
 
 .card-front {
   transform: rotateY(180deg);
-  background: #21262d;
-  border: 2px solid #30363d;
+  background: #252526;
+  border: 1px solid #3e3e42;
   flex-direction: column;
   justify-content: flex-start;
 }
 
 .card-back {
-  background: #161b22;
-  border: 2px solid #30363d;
+  background: #1e1e1e;
+  border: 1px solid #3e3e42;
 }
 
 .card-front-image {
   width: 100%;
   flex: 1;
   min-height: 0;
-  background: #0d1117;
+  background: #1e1e1e;
   padding: 0;
 }
 
@@ -80,19 +80,23 @@
   font-size: 0.72rem;
   line-height: 1.2;
   text-align: center;
-  color: #c9d1d9;
-  background: #161b22;
-  border-top: 1px solid #30363d;
+  color: #858585;
+  background: #1e1e1e;
+  border-top: 1px solid #3e3e42;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .card.matched .card-front {
-  border-color: #3fb950;
-  box-shadow: 0 0 12px rgba(63, 185, 80, 0.3);
+  border-color: #4ec9b0;
+  box-shadow: 0 0 10px rgba(78, 201, 176, 0.3);
+}
+
+.card:not(.flipped):not(.matched):hover .card-back {
+  border-color: #f48771;
 }
 
 .card:focus-visible {
-  outline: 2px solid #58a6ff;
+  outline: 2px solid #f48771;
 }

@@ -18,7 +18,6 @@ function GameBoard() {
   const remainingMoves = getRemainingMoves(damage)
   const healthPercent = getHealthPercent(damage)
   const healthState = healthPercent <= 30 ? 'danger' : healthPercent <= 60 ? 'warn' : 'safe'
-  const showRuleHint = moves === 0 && !isWon && !isLost
 
   const handleCardClick = useCallback(
     (uniqueId) => {
@@ -102,6 +101,12 @@ function GameBoard() {
             <div className={`health-bar-fill health-bar-fill-${healthState}`} style={{ width: `${healthPercent}%` }} />
           </div>
         </div>
+        <div className="rules-section">
+          <h3 className="panel-heading">Rules</h3>
+          <p className="rule-hint" data-testid="rule-hint" role="note">
+            Click or tap two cards to find a matching pair. Each mismatch costs 1 health.
+          </p>
+        </div>
       </div>
 
       {isWon && (
@@ -114,12 +119,6 @@ function GameBoard() {
           💥 Game over! You ran out of moves.
         </div>
       )}
-      {showRuleHint && (
-        <p className="rule-hint" data-testid="rule-hint" role="note">
-          Click or tap two cards to find a matching pair.
-        </p>
-      )}
-
       <div className="game-board" data-testid="game-board">
         {cards.map((card) => (
           <Card

@@ -1,5 +1,5 @@
 export const BEST_SCORE_STORAGE_KEY = 'octomatch-best-score'
-export const MAX_MOVES = 30
+export const MAX_MOVES = 20
 
 export function getRemainingMoves(moves, maxMoves = MAX_MOVES) {
   return Math.max(maxMoves - moves, 0)

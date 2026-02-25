@@ -1,12 +1,13 @@
 import { test, expect } from '@playwright/test'
 
-test.describe('OctoMatch Memory Game', () => {
+test.describe('OctoGames: OctoMatch Memory Game', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/')
   })
 
   test('page loads with title and 16 face-down cards', async ({ page }) => {
     await expect(page.locator('h1')).toContainText('OctoMatch')
+    await expect(page.locator('.subtitle')).toContainText('OctoGames')
     const cards = page.locator('[data-testid="game-board"] button')
     await expect(cards).toHaveCount(16)
   })

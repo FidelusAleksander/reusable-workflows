@@ -74,7 +74,7 @@ describe('GameBoard', () => {
     expect(screen.getByTestId('moves-remaining')).toHaveTextContent(`${MAX_MOVES}/${MAX_MOVES}`)
   })
 
-  it('shows a rule hint before the first move and hides it after', async () => {
+  it('keeps rules hint visible after moves', async () => {
     const user = userEvent.setup()
     render(<GameBoard />)
 
@@ -83,7 +83,7 @@ describe('GameBoard', () => {
     await user.click(screen.getByTestId('card-a-1'))
     await user.click(screen.getByTestId('card-a-2'))
 
-    expect(screen.queryByTestId('rule-hint')).not.toBeInTheDocument()
+    expect(screen.getByTestId('rule-hint')).toBeInTheDocument()
   })
 
   it('keeps matched cards face-up', async () => {

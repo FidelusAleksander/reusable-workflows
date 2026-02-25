@@ -7,12 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
     "test": "vitest run src",
-    "test:watch": "vitest src",
     "test:coverage": "vitest run --coverage src",
-    "test:e2e": "playwright test",
-    "test:e2e:headed": "playwright test --headed"
+    "test:e2e": "playwright test"
   },
   "dependencies": {
     "react": "^19.2.4",
