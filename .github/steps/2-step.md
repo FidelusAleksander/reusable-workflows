@@ -1,8 +1,8 @@
-## Step 2: (replace-me: STEP-NAME)
+## Step 2: Call the reusable workflow
 
-(replace-me: OPTIONAL Brief story or scenario to introduce the step)
+Now that your reusable workflow exists, you can call it from another workflow instead of duplicating steps.
 
-### 📖 Theory: (replace-me: Theory title)
+### 📖 Theory: Calling reusable workflows
 
 <!-- GitHub-styled notifications can be used outside of ordered lists. Available options are: NOTE, IMPORTANT, WARNING, TIP, CAUTION -->
 <!--
@@ -10,27 +10,43 @@
 > (Important note or additional information relevant to this section)
  -->
 
-(replace-me: Optional theory or background information relevant to this step)
+A caller workflow references a reusable workflow with `uses` at the job level. For a reusable workflow in the same repository, use a relative path like `./.github/workflows/reusable-ci.yml`.
 
-(replace-me: OPTIONAL Reference images from the `.github/images/` directory to support any part of the content)
+This pattern separates orchestration from implementation:
+
+- Caller workflow: chooses when CI runs
+- Reusable workflow: defines what CI does
 
 <img width="200" alt="descriptive alt text" src="../images/inflatocat.png" />
 
+### ⌨️ Activity: Add `.github/workflows/ci.yml` to call your reusable workflow
 
-### ⌨️ Activity: (replace-me: Activity title)
+1. Create a new file at `.github/workflows/ci.yml`.
 
-1. (replace-me: First instruction)
+1. Add this workflow:
 
-    (replace-me: Make sure to properly indent any multiline instructions)
+   ```yaml
+   name: CI
 
-1. (replace-me: Second instruction)
+   on:
+     push:
+       branches:
+         - main
+     pull_request:
 
-1. (replace-me: Additional instructions as needed)
+   jobs:
+     reusable:
+       uses: ./.github/workflows/reusable-ci.yml
+   ```
+
+1. Commit your changes to `main`.
+
+1. Wait for this step to be checked automatically.
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
-- (replace-me: Troubleshooting tip or hint)
-- (replace-me: Additional troubleshooting tips as needed)
+- Ensure `uses` is under `jobs.<job_id>`, not inside `steps`.
+- Confirm the path is exactly `./.github/workflows/reusable-ci.yml`.
 
 </details>

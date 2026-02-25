@@ -1,35 +1,46 @@
-## Step 3: (replace-me: STEP-NAME)
+## Step 3: Add inputs to make the workflow flexible
 
-(replace-me: OPTIONAL Brief story or scenario to introduce the step)
+Reusable workflows are most useful when they support configurable behavior through inputs.
 
-### 📖 Theory: (replace-me: Theory title)
+### 📖 Theory: Inputs in `workflow_call`
 
-<!-- GitHub-styled notifications can be used outside of ordered lists. Available options are: NOTE, IMPORTANT, WARNING, TIP, CAUTION -->
-<!--
-> [!NOTE]
-> (Important note or additional information relevant to this section)
- -->
+Inputs let caller workflows pass values into the reusable workflow. Define inputs in the `workflow_call` block and reference them through the `inputs` context.
 
-(replace-me: Optional theory or background information relevant to this step)
+This makes one reusable workflow work for many use cases without copying files.
 
-### ⌨️ Activity: (replace-me: Activity title)
+### ⌨️ Activity: Add and use a `node-version` input
 
-1. (replace-me: First instruction)
+1. Open `.github/workflows/reusable-ci.yml`.
 
-   (replace-me: Make sure to properly indent any multiline instructions)
+1. In `on.workflow_call`, add an input named `node-version`:
 
-1. (replace-me: Second instruction)
+   ```yaml
+   on:
+     workflow_call:
+       inputs:
+         node-version:
+           required: false
+           type: string
+           default: "20"
+   ```
 
-   (replace-me: Optionally reference images from the `.github/images/` directory to support any part of the content)
+1. In the reusable job, add a step that prints the selected version:
 
-   <img width="200" alt="descriptive alt text" src="../images/jetpacktocat.png" />
+   ```yaml
+   - name: Show selected Node version
+     run: echo "Node version: ${{ inputs.node-version }}"
+   ```
 
-1. (replace-me: Additional instructions as needed)
+1. Open `.github/workflows/ci.yml` and pass `node-version: '20'` with `with:` under the `reusable` job.
+
+   <img width="200" alt="Mona with jetpack" src="../images/jetpacktocat.png" />
+
+1. Commit the changes to `main` to finish the exercise.
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
-- (replace-me: Troubleshooting tip or hint)
-- (replace-me: Additional troubleshooting tips as needed)
+- Keep input definitions under `on.workflow_call.inputs`.
+- Use quotes around version strings like `'20'` to avoid YAML parsing surprises.
 
 </details>

@@ -63,22 +63,22 @@ jobs:
 
       # START: Check practical exercise
 
-      # replace-me: Example of a grading check. You can add more checks as needed.
-      - name: Check if README file exists
+      # Check that the reusable workflow file was created.
+      - name: Check if reusable workflow file exists
         id: check-file-exists
         continue-on-error: true
         uses: skills/exercise-toolkit/actions/file-exists@v0.8.1
         with:
-          file: README.md
+          file: .github/workflows/reusable-ci.yml
 
-      # replace-me: Example of a grading check. You can add more checks as needed.
-      - name: Check for keyphrase in README.md
+      # Check that the caller workflow references the reusable workflow.
+      - name: Check for reusable workflow call in ci.yml
         id: check-for-keyphrase
         continue-on-error: true
         uses: skills/action-keyphrase-checker@v1
         with:
-          text-file: README.md
-          keyphrase: Installation guide
+          text-file: .github/workflows/ci.yml
+          keyphrase: "uses: ./.github/workflows/reusable-ci.yml"
 
       - name: Update comment - step results
         uses: GrantBirki/comment@v2.1.1
@@ -91,9 +91,9 @@ jobs:
           vars: |
             step_number: 2
             results_table:
-              - description: "Checked if README.md file exists"
+              - description: "Checked if .github/workflows/reusable-ci.yml exists"
                 passed: ${{ steps.check-file-exists.outcome == 'success' }}
-              - description: "Checked for Installation guide in README.md"
+              - description: "Checked for reusable workflow call in .github/workflows/ci.yml"
                 passed: ${{ steps.check-for-keyphrase.outcome == 'success' }}
 
       # Add more checks as needed
@@ -106,7 +106,7 @@ jobs:
 
   post_next_step_content:
     name: Post next step content
-    needs: [find_exercise] # if check_step_work then "needs: [find_exercise, check_step_work]"
+    needs: [find_exercise, check_step_work]
     runs-on: ubuntu-latest
     env:
       ISSUE_REPOSITORY: ${{ github.repository }}

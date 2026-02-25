@@ -1,31 +1,29 @@
-# (replace-me: Exercise title)
+# Create and use reusable workflows
 
-_(replace-me: One-line description of the exercise)_
+_Build a reusable GitHub Actions workflow and call it from another workflow._
 
 ## Welcome
 
-- **Who is this for**: (replace-me: Target audience description)
-- **What you'll learn**: (replace-me: Learning objectives)
-- **What you'll build**: (replace-me: Description of what the learner will create)
+- **Who is this for**: Developers and maintainers who want to reduce duplication in GitHub Actions pipelines.
+- **What you'll learn**: How to define `workflow_call` inputs and secrets, and how to invoke a reusable workflow from another workflow.
+- **What you'll build**: A small CI setup where one workflow centralizes shared logic and another workflow calls it.
 - **Prerequisites**:
-  - (replace-me: Prerequisite skill/exercise)
-  - (replace-me: Other prerequisites)
+  - Basic familiarity with GitHub Actions workflows
+  - A GitHub account with permission to create repositories from templates
 
-- **How long**: This exercise takes less than (replace-me: estimated time) to complete.
+- **How long**: This exercise takes less than 30 minutes to complete.
 
 In this exercise, you will:
 
-1. (replace-me: Learning objective step #1)
-1. (replace-me: Learning objective step #2)
-1. (replace-me: Learning objective step #N)
-
+1. Create a reusable workflow using `workflow_call`.
+1. Pass inputs/secrets from a caller workflow.
+1. Validate that workflow runs execute through the reusable entry point.
 
 ### How to start this exercise
 
 Simply copy the exercise to your account, then give your favorite Octocat (Mona) **about 20 seconds** to prepare the first lesson, then **refresh the page**.
 
-<!--  (replace-me: Make sure to edit the URL with proper template_owner, template_name, repo name and description)  -->
-[![](https://img.shields.io/badge/Copy%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=skills&template_name=exercise-template&owner=%40me&name=skills-<replace-me>&description=Exercise:+Replace+me&visibility=public)
+[![](https://img.shields.io/badge/Copy%20Exercise-%E2%86%92-1f883d?style=for-the-badge&logo=github&labelColor=197935)](https://github.com/new?template_owner=FidelusAleksander&template_name=reusable-workflows&owner=%40me&name=reusable-workflows-exercise&description=GitHub+Skills:+Create+and+use+reusable+workflows&visibility=public)
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
