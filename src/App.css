@@ -1,0 +1,78 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  gap: 2rem;
+  background:
+    radial-gradient(circle at top center, rgba(88, 166, 255, 0.14), transparent 48%),
+    linear-gradient(180deg, rgba(13, 17, 23, 0.96) 0%, #0d1117 65%);
+}
+
+.app-header {
+  width: 100%;
+  max-width: 680px;
+  text-align: center;
+  padding: 1rem 1.15rem;
+  border: 1px solid rgba(88, 166, 255, 0.2);
+  border-radius: 14px;
+  background: linear-gradient(160deg, rgba(22, 27, 34, 0.86), rgba(13, 17, 23, 0.96));
+  box-shadow: 0 12px 28px rgba(1, 4, 9, 0.35);
+}
+
+.app-title {
+  font-size: 2.5rem;
+  margin: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  letter-spacing: 0.02em;
+}
+
+.app-title-text {
+  color: #f0f6fc;
+  text-shadow: 0 0 24px rgba(88, 166, 255, 0.22);
+}
+
+.app-logo {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+  border-radius: 10px;
+  border: 1px solid rgba(88, 166, 255, 0.35);
+  box-shadow: 0 8px 20px rgba(1, 4, 9, 0.45);
+}
+
+.subtitle {
+  margin: 0.45rem 0 0;
+  color: #adbac7;
+  font-size: 0.98rem;
+  letter-spacing: 0.01em;
+}
+
+main {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+@media (max-width: 560px) {
+  .app {
+    padding: 1.2rem 0.8rem;
+    gap: 1.3rem;
+  }
+
+  .app-header {
+    padding: 0.85rem 0.95rem;
+  }
+
+  .app-title {
+    font-size: 2rem;
+  }
+
+  .app-logo {
+    width: 40px;
+    height: 40px;
+  }
+}
