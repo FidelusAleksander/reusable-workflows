@@ -27,7 +27,6 @@ Let's use **GitHub Codespaces** to set up a cloud-based development environment 
    [![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/{{full_repo_name}}?quickstart=1)
 
 1. Confirm the **Repository** field is your copy of the exercise, not the original, then click the green **Create Codespace** button.
-
    - ✅ Your copy: `/{{full_repo_name}}`
    - ❌ Original: `/skills/reusable-workflows`
 
@@ -35,9 +34,7 @@ Let's use **GitHub Codespaces** to set up a cloud-based development environment 
 
 ### ⌨️ Activity: Create a reusable workflow
 
-### ⌨️ Activity: Create Basic Docker Publish Workflow
-
-Let's start off by creating a workflow to build and publish our **Stackoverflown** game as a docker image.
+Let's start off by creating a reusable workflow for the Node.js projects in your company. This workflow will run linting, tests with coverage reporting, and end-to-end tests with Playwright.
 
 1. In your codespace create a new branch named exactly `reusable-workflows` and switch to it.
 
@@ -53,22 +50,22 @@ Let's start off by creating a workflow to build and publish our **Stackoverflown
 
 1. Within that file, let's start by defining the workflow name, event trigger and permissions:
 
-    ```yaml
-    name: Reusable Node Quality
-    run-name: Node ${{ inputs.node-version }} Quality Checks
+   ```yaml
+   name: Reusable Node Quality
+   run-name: Node {% raw %}${{ inputs.node-version }}{% endraw %} Quality Checks
 
-    on:
-      workflow_call:
-        inputs:
-          node-version:
-            description: 'Node.js version'
-            required: false
-            default: '20'
-            type: string
+   on:
+     workflow_call:
+       inputs:
+         node-version:
+           description: "Node.js version"
+           required: false
+           default: "20"
+           type: string
 
-    permissions:
-      contents: read
-    ```
+   permissions:
+     contents: read
+   ```
 
    This workflow can be called from other workflows in the same repository or even from different repositories with permissions to read the repository contents and push packages to the GitHub Container Registry.
 
@@ -76,45 +73,45 @@ Let's start off by creating a workflow to build and publish our **Stackoverflown
 
    These are the jobs that you found yourself copy-pasting across repositories the most, so it makes sense to centralize them in a reusable workflow.
 
-    ```yaml
-    jobs:
-      lint:
-        name: Lint
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v6
-          - uses: actions/setup-node@v6
-            with:
-              node-version: ${{ inputs.node-version }}
-              cache: npm
-          - run: npm ci
-          - run: npm run lint
+   ```yaml
+   jobs:
+     lint:
+       name: Lint
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v6
+         - uses: actions/setup-node@v6
+           with:
+             node-version: {% raw %}${{ inputs.node-version }}{% endraw %}
+             cache: npm
+         - run: npm ci
+         - run: npm run lint
 
-      tests:
-        name: Tests with Coverage
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v6
-          - uses: actions/setup-node@v6
-            with:
-              node-version: ${{ inputs.node-version }}
-              cache: npm
-          - run: npm ci
-          - run: npm run test:coverage
+     tests:
+       name: Tests with Coverage
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v6
+         - uses: actions/setup-node@v6
+           with:
+             node-version: {% raw %}${{ inputs.node-version }}{% endraw %}
+             cache: npm
+         - run: npm ci
+         - run: npm run test:coverage
 
-      e2e:
-        name: E2E Tests with Playwright
-        runs-on: ubuntu-latest
-        steps:
-          - uses: actions/checkout@v6
-          - uses: actions/setup-node@v6
-            with:
-              node-version: ${{ inputs.node-version }}
-              cache: npm
-          - run: npm ci
-          - run: npx playwright install --with-deps chromium
-          - run: npm run test:e2e
-    ```
+     e2e:
+       name: E2E Tests with Playwright
+       runs-on: ubuntu-latest
+       steps:
+         - uses: actions/checkout@v6
+         - uses: actions/setup-node@v6
+           with:
+             node-version: {% raw %}${{ inputs.node-version }}{% endraw %}
+             cache: npm
+         - run: npm ci
+         - run: npx playwright install --with-deps chromium
+         - run: npm run test:e2e
+   ```
 
    Each job checks out the repository code, sets up Node.js using the version specified in the workflow input, installs dependencies, and runs the appropriate npm script (`lint`, `test:coverage`, and `test:e2e` respectively).
 

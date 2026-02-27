@@ -32,7 +32,7 @@ When using a reusable workflow from another repository, pin `@ref` to a stable t
      quality:
        uses: ./.github/workflows/reusable-node-quality.yml
         with:
-          node-version: 20
+          node-version: 24
    ```
 
 ### ⌨️ Activity: Commit, push, and open a pull request

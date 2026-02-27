@@ -1,9 +1,6 @@
 name: CI
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
@@ -18,20 +15,36 @@ jobs:
     with:
       node-version: "24"
 
-  build:
-    name: Build Website
+  pages:
+    name: Deploy to GitHub Pages
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
     needs: quality
+    uses: ./.github/workflows/deploy-pages.yml
+    with:
+      node-version: "24"
+
+  comment:
+    name: Comment on PR
+    if: always()
+    needs: [quality, pages]
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-node@v6
+      - name: Comment with Pages URL
+        uses: GrantBirki/comment@v2.1.1
         with:
-          node-version: "24"
-          cache: npm
-      - run: npm ci
-      - run: npm run build
-      - uses: actions/upload-artifact@v6
-        with:
-          name: build-dist
-          path: dist/
-          if-no-files-found: error
+          issue-number: ${{ github.event.pull_request.number }}
+          body: |
+            ✅ **Quality checks completed with status "${{ needs.quality.result }}"**
+
+
+            **Workflow run:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            **GitHub Pages URL:** ${{ needs.pages.outputs.page_url }}
+
+
+
