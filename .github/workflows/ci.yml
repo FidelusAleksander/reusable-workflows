@@ -15,6 +15,8 @@ jobs:
   quality:
     name: Quality checks
     uses: ./.github/workflows/reusable-node-quality.yml
+    with:
+      node-version: "24"
 
   build:
     name: Build Website

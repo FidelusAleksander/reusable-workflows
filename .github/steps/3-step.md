@@ -1,46 +1,27 @@
-## Step 3: Add inputs to make the workflow flexible
+## Step 3: Add inputs and outputs
 
-Reusable workflows are most useful when they support configurable behavior through inputs.
+In this final step, you will make your reusable workflow configurable and return useful data back to the caller.
 
-### 📖 Theory: Inputs in `workflow_call`
+### 📖 Theory: Inputs and outputs in reusable workflows
 
-Inputs let caller workflows pass values into the reusable workflow. Define inputs in the `workflow_call` block and reference them through the `inputs` context.
+Inputs define values the caller can pass into the reusable workflow using `with`. Outputs define values the reusable workflow returns to the caller after execution.
 
-This makes one reusable workflow work for many use cases without copying files.
+A common pattern is to expose a summary value from tests, then use it in a follow-up job in the caller workflow.
 
-### ⌨️ Activity: Add and use a `node-version` input
+### ⌨️ Activity: Pass `node-version` and publish `coverage-percent`
 
-1. Open `.github/workflows/reusable-ci.yml`.
-
-1. In `on.workflow_call`, add an input named `node-version`:
-
-   ```yaml
-   on:
-     workflow_call:
-       inputs:
-         node-version:
-           required: false
-           type: string
-           default: "20"
-   ```
-
-1. In the reusable job, add a step that prints the selected version:
-
-   ```yaml
-   - name: Show selected Node version
-     run: echo "Node version: ${{ inputs.node-version }}"
-   ```
-
-1. Open `.github/workflows/ci.yml` and pass `node-version: '20'` with `with:` under the `reusable` job.
-
-   <img width="200" alt="Mona with jetpack" src="../images/jetpacktocat.png" />
-
-1. Commit the changes to `main` to finish the exercise.
+1. Open `.github/workflows/reusable-node-quality.yml`.
+1. In `on.workflow_call`, ensure there is an input named `node-version` and add a workflow output named `coverage-percent`.
+1. In the tests job, capture coverage percent from the coverage summary file and map it to a job output.
+1. Open `.github/workflows/ci.yml` and, in the caller job, pass `node-version` with `with:`.
+1. Add a follow-up job that reads `{% raw %}${{ needs.quality.outputs.coverage-percent }}{% endraw %}` and posts it in a pull request comment.
+1. Merge the pull request into `main` to finish the exercise.
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
-- Keep input definitions under `on.workflow_call.inputs`.
-- Use quotes around version strings like `'20'` to avoid YAML parsing surprises.
+- Workflow outputs in `workflow_call` must map to job-level outputs.
+- Caller jobs can read reusable workflow outputs with `needs.<job-id>.outputs.<name>`.
+- If you post a pull request comment, ensure the job has `pull-requests: write` permission.
 
 </details>

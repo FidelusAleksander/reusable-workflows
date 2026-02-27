@@ -55,18 +55,19 @@ Let's start off by creating a workflow to build and publish our **Stackoverflown
 
     ```yaml
     name: Reusable Node Quality
+    run-name: Node ${{ inputs.node-version }} Quality Checks
 
     on:
       workflow_call:
         inputs:
           node-version:
             description: 'Node.js version'
-            required: true
+            required: false
+            default: '20'
             type: string
 
     permissions:
       contents: read
-
     ```
 
    This workflow can be called from other workflows in the same repository or even from different repositories with permissions to read the repository contents and push packages to the GitHub Container Registry.

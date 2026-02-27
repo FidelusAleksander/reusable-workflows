@@ -1,52 +1,53 @@
-## Step 2: Call the reusable workflow
+## Step 2: Let's use the reusable workflow!
 
-Now that your reusable workflow exists, you can call it from another workflow instead of duplicating steps.
+Nice! You've finally created a reusable workflow and you're ready to use it.
 
-### 📖 Theory: Calling reusable workflows
+In this step, you'll create a caller workflow that runs on pull requests and delegates quality checks to that reusable workflow.
 
-<!-- GitHub-styled notifications can be used outside of ordered lists. Available options are: NOTE, IMPORTANT, WARNING, TIP, CAUTION -->
-<!--
-> [!NOTE]
-> (Important note or additional information relevant to this section)
- -->
+### 📖 Theory: How to use reusable workflows?
 
-A caller workflow references a reusable workflow with `uses` at the job level. For a reusable workflow in the same repository, use a relative path like `./.github/workflows/reusable-ci.yml`.
+In this exercise, you will call a reusable workflow from the same repository, but you can also call reusable workflows from other repositories to share standards across teams.
 
-This pattern separates orchestration from implementation:
+| Reusable workflow location | `uses` syntax                                   | Typical use case                                                         |
+| -------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------ |
+| Same repository            | `./.github/workflows/reusable-node-quality.yml` | Keep workflow logic close to one project                                 |
+| Different repository       | `owner/repo/.github/workflows/workflow.yml@ref` | Share standardized workflows across many repositories in an organization |
 
-- Caller workflow: chooses when CI runs
-- Reusable workflow: defines what CI does
+When using a reusable workflow from another repository, pin `@ref` to a stable tag or SHA for predictable behavior.
 
-<img width="200" alt="descriptive alt text" src="../images/inflatocat.png" />
+### ⌨️ Activity: Create a CI workflow and call your reusable workflow
 
-### ⌨️ Activity: Add `.github/workflows/ci.yml` to call your reusable workflow
-
-1. Create a new file at `.github/workflows/ci.yml`.
-
-1. Add this workflow:
+1. Open `.github/workflows/ci.yml`.
+1. Replace the file contents with this workflow:
 
    ```yaml
    name: CI
 
    on:
-     push:
+     pull_request:
        branches:
          - main
-     pull_request:
 
    jobs:
-     reusable:
-       uses: ./.github/workflows/reusable-ci.yml
+     quality:
+       uses: ./.github/workflows/reusable-node-quality.yml
+        with:
+          node-version: 20
    ```
 
-1. Commit your changes to `main`.
+### ⌨️ Activity: Commit, push, and open a pull request
 
+1. Commit your `ci.yml` changes to the `reusable-workflows` branch.
+1. Push the branch to GitHub.
+1. Open or update a pull request from `reusable-workflows` into `main`.
+1. Open the pull request **Checks** tab and confirm the CI workflow starts running.
 1. Wait for this step to be checked automatically.
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
-- Ensure `uses` is under `jobs.<job_id>`, not inside `steps`.
-- Confirm the path is exactly `./.github/workflows/reusable-ci.yml`.
+- Keep `uses` directly under `jobs.<job_id>`.
+- Confirm the filename is `reusable-node-quality.yml`.
+- Make sure your pull request targets `main`.
 
 </details>
