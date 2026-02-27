@@ -4,7 +4,7 @@ Your company Octogames has been continuously shipping new web games! You, as the
 
 You got tired of copy-pasting the same workflow logic across repositories and decided to learn how to create reusable workflows to standardize and simplify the process. In this exercise, you'll create a reusable workflow that can be called from other workflows in the same repository or even from different repositories.
 
-<img width="200" alt="descriptive alt text" src="../images/octomatch.png" />
+<img width="900" alt="descriptive alt text" src="../images/octomatch.png" />
 
 ### 📖 Theory: What makes a workflow reusable?
 
