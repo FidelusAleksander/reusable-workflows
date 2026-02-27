@@ -8,6 +8,13 @@ on:
         required: false
         default: "24"
         type: string
+    outputs:
+      node-version-used:
+        description: Node.js version used by the reusable workflow
+        value: ${{ jobs.tests.outputs.node-version-used }}
+      coverage-percent:
+        description: Total line coverage percentage from test run
+        value: ${{ jobs.tests.outputs.coverage-percent }}
 
 permissions:
   contents: read
@@ -28,14 +35,25 @@ jobs:
   tests:
     name: Tests with Coverage
     runs-on: ubuntu-latest
+    outputs:
+      node-version-used: ${{ steps.node-version-output.outputs.value }}
+      coverage-percent: ${{ steps.coverage-summary.outputs.value }}
     steps:
       - uses: actions/checkout@v6
       - uses: actions/setup-node@v6
         with:
           node-version: ${{ inputs.node-version }}
           cache: npm
+      - name: Capture selected Node version
+        id: node-version-output
+        run: echo "value=${{ inputs.node-version }}" >> "$GITHUB_OUTPUT"
       - run: npm ci
       - run: npm run test:coverage
+      - name: Capture coverage percent
+        id: coverage-summary
+        run: |
+          value=$(node -e "const fs=require('fs');const p='coverage/coverage-summary.json';const summary=JSON.parse(fs.readFileSync(p,'utf8'));const pct=summary.total.lines.pct;process.stdout.write(String(pct));")
+          echo "value=${value}" >> "$GITHUB_OUTPUT"
 
   e2e:
     name: E2E Tests with Playwright

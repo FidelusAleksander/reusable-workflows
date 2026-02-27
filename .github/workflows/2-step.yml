@@ -1,15 +1,13 @@
 name: Step 2
 
 on:
-  workflow_dispatch:
-  # Common event triggers: pull_request, push, issues, issue_comment (feel free to experiment)
-  # Docs: https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows
-  # Example:
-  # pull_request:
-  #   branches:
-  #     - main
-  #   types:
-  #     - closed
+  pull_request:
+    branches:
+      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 permissions:
   contents: write
@@ -31,7 +29,7 @@ jobs:
     needs: [find_exercise]
     env:
       ISSUE_REPOSITORY: ${{ github.repository }}
-      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs['issue-number'] }}
 
     steps:
       - name: Checkout
@@ -63,22 +61,30 @@ jobs:
 
       # START: Check practical exercise
 
-      # Check that the reusable workflow file was created.
-      - name: Check if reusable workflow file exists
-        id: check-file-exists
-        continue-on-error: true
-        uses: skills/exercise-toolkit/actions/file-exists@v0.8.1
-        with:
-          file: .github/workflows/reusable-ci.yml
-
       # Check that the caller workflow references the reusable workflow.
       - name: Check for reusable workflow call in ci.yml
-        id: check-for-keyphrase
+        id: check-workflow-call
         continue-on-error: true
         uses: skills/action-keyphrase-checker@v1
         with:
           text-file: .github/workflows/ci.yml
-          keyphrase: "uses: ./.github/workflows/reusable-ci.yml"
+          keyphrase: "uses: ./.github/workflows/reusable-node-quality.yml"
+
+      - name: Check for job-level permissions block in ci.yml
+        id: check-permissions-block
+        continue-on-error: true
+        uses: skills/action-keyphrase-checker@v1
+        with:
+          text-file: .github/workflows/ci.yml
+          keyphrase: "permissions:"
+
+      - name: Check for contents read permission in ci.yml
+        id: check-contents-read
+        continue-on-error: true
+        uses: skills/action-keyphrase-checker@v1
+        with:
+          text-file: .github/workflows/ci.yml
+          keyphrase: "contents: read"
 
       - name: Update comment - step results
         uses: GrantBirki/comment@v2.1.1
@@ -91,10 +97,12 @@ jobs:
           vars: |
             step_number: 2
             results_table:
-              - description: "Checked if .github/workflows/reusable-ci.yml exists"
-                passed: ${{ steps.check-file-exists.outcome == 'success' }}
               - description: "Checked for reusable workflow call in .github/workflows/ci.yml"
-                passed: ${{ steps.check-for-keyphrase.outcome == 'success' }}
+                passed: ${{ steps.check-workflow-call.outcome == 'success' }}
+              - description: "Checked for permissions block in .github/workflows/ci.yml"
+                passed: ${{ steps.check-permissions-block.outcome == 'success' }}
+              - description: "Checked for contents: read permission in .github/workflows/ci.yml"
+                passed: ${{ steps.check-contents-read.outcome == 'success' }}
 
       # Add more checks as needed
 
@@ -110,7 +118,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       ISSUE_REPOSITORY: ${{ github.repository }}
-      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs['issue-number'] }}
 
     steps:
       - name: Checkout
