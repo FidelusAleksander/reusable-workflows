@@ -14,33 +14,9 @@ permissions:
 jobs:
   quality:
     name: Quality checks
-    permissions:
-      contents: read
     uses: ./.github/workflows/reusable-node-quality.yml
     with:
       node-version: "24"
-
-  coverage_comment:
-    name: Comment coverage on pull request
-    if: github.event_name == 'pull_request'
-    needs: quality
-    runs-on: ubuntu-latest
-    permissions:
-      pull-requests: write
-    steps:
-      - name: Comment coverage summary
-        uses: actions/github-script@v8
-        with:
-          script: |
-            const coveragePercent = "${{ needs.quality.outputs['coverage-percent'] }}"
-            const nodeVersion = "${{ needs.quality.outputs['node-version-used'] }}"
-
-            await github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: `### CI Coverage Summary\n\n- Node version: ${nodeVersion}\n- Line coverage: ${coveragePercent}%`
-            })
 
   build:
     name: Build Website
