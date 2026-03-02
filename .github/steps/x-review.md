@@ -8,7 +8,7 @@ Here's a recap of your accomplishments:
 
 - Created a reusable workflow using `workflow_call`
 - Called that reusable workflow from a standard CI workflow
-- Added an input to make the reusable workflow configurable
+- Added permissions-aware deployment and PR feedback jobs to the caller workflow
 
 ### What's next?
 

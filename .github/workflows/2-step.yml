@@ -68,7 +68,7 @@ jobs:
         uses: skills/action-keyphrase-checker@v1
         with:
           text-file: .github/workflows/ci.yml
-          keyphrase: "uses: ./.github/workflows/reusable-node-quality.yml"
+          keyphrase: 'uses:\s*\.\/\.github\/workflows\/reusable-node-quality\.yml'
 
       - name: Check for job-level permissions block in ci.yml
         id: check-permissions-block
@@ -76,7 +76,7 @@ jobs:
         uses: skills/action-keyphrase-checker@v1
         with:
           text-file: .github/workflows/ci.yml
-          keyphrase: "permissions:"
+          keyphrase: '^\s*permissions:\s*$'
 
       - name: Check for contents read permission in ci.yml
         id: check-contents-read
@@ -84,7 +84,7 @@ jobs:
         uses: skills/action-keyphrase-checker@v1
         with:
           text-file: .github/workflows/ci.yml
-          keyphrase: "contents: read"
+          keyphrase: 'contents:\s*read'
 
       - name: Update comment - step results
         uses: GrantBirki/comment@v2.1.1

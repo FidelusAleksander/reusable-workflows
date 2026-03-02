@@ -1,11 +1,11 @@
 name: Step 3
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - CI
     types:
-      - closed
+      - completed
 
 permissions:
   contents: write
@@ -22,7 +22,6 @@ jobs:
 
   check_step_work:
     name: Check step work
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     needs: [find_exercise]
     env:
@@ -59,45 +58,45 @@ jobs:
 
       # START: Check practical exercise
 
-      - name: Check for node-version input in reusable workflow
-        id: check-node-input
-        continue-on-error: true
-        uses: skills/action-keyphrase-checker@v1
-        with:
-          text-file: .github/workflows/reusable-node-quality.yml
-          keyphrase: "node-version:"
-
-      - name: Check for coverage-percent output in reusable workflow
-        id: check-coverage-output
-        continue-on-error: true
-        uses: skills/action-keyphrase-checker@v1
-        with:
-          text-file: .github/workflows/reusable-node-quality.yml
-          keyphrase: "coverage-percent:"
-
-      - name: Check for coverage summary parsing
-        id: check-coverage-summary
-        continue-on-error: true
-        uses: skills/action-keyphrase-checker@v1
-        with:
-          text-file: .github/workflows/reusable-node-quality.yml
-          keyphrase: "coverage/coverage-summary.json"
-
-      - name: Check for node-version input passed in caller workflow
-        id: check-caller-input
+      - name: Check for github-pages job in caller workflow
+        id: check-github-pages-job
         continue-on-error: true
         uses: skills/action-keyphrase-checker@v1
         with:
           text-file: .github/workflows/ci.yml
-          keyphrase: "node-version:"
+          keyphrase: '^\s*github-pages:\s*$'
 
-      - name: Check for coverage output usage in caller workflow
-        id: check-caller-coverage-output
+      - name: Check for deploy-pages reusable workflow usage
+        id: check-deploy-pages-call
         continue-on-error: true
         uses: skills/action-keyphrase-checker@v1
         with:
           text-file: .github/workflows/ci.yml
-          keyphrase: "needs.quality.outputs.coverage-percent"
+          keyphrase: 'uses:\s*\.\/\.github\/workflows\/deploy-pages\.yml'
+
+      - name: Check for comment job in caller workflow
+        id: check-comment-job
+        continue-on-error: true
+        uses: skills/action-keyphrase-checker@v1
+        with:
+          text-file: .github/workflows/ci.yml
+          keyphrase: '^\s*comment:\s*$'
+
+      - name: Check for always condition in comment job
+        id: check-comment-always
+        continue-on-error: true
+        uses: skills/action-keyphrase-checker@v1
+        with:
+          text-file: .github/workflows/ci.yml
+          keyphrase: 'if:\s*always\(\)'
+
+      - name: Check for PR comment action usage
+        id: check-comment-action
+        continue-on-error: true
+        uses: skills/action-keyphrase-checker@v1
+        with:
+          text-file: .github/workflows/ci.yml
+          keyphrase: 'uses:\s*GrantBirki\/comment@v2\.1\.1'
 
       - name: Update comment - step results
         uses: GrantBirki/comment@v2.1.1
@@ -110,16 +109,16 @@ jobs:
           vars: |
             step_number: 3
             results_table:
-              - description: "Checked for node-version input in reusable workflow"
-                passed: ${{ steps.check-node-input.outcome == 'success' }}
-              - description: "Checked for coverage-percent output in reusable workflow"
-                passed: ${{ steps.check-coverage-output.outcome == 'success' }}
-              - description: "Checked for coverage summary parsing in reusable workflow"
-                passed: ${{ steps.check-coverage-summary.outcome == 'success' }}
-              - description: "Checked for node-version input passed in .github/workflows/ci.yml"
-                passed: ${{ steps.check-caller-input.outcome == 'success' }}
-              - description: "Checked for coverage output usage in .github/workflows/ci.yml"
-                passed: ${{ steps.check-caller-coverage-output.outcome == 'success' }}
+              - description: "Checked for github-pages job in .github/workflows/ci.yml"
+                passed: ${{ steps.check-github-pages-job.outcome == 'success' }}
+              - description: "Checked for deploy-pages reusable workflow call in .github/workflows/ci.yml"
+                passed: ${{ steps.check-deploy-pages-call.outcome == 'success' }}
+              - description: "Checked for comment job in .github/workflows/ci.yml"
+                passed: ${{ steps.check-comment-job.outcome == 'success' }}
+              - description: "Checked for always() condition in comment job"
+                passed: ${{ steps.check-comment-always.outcome == 'success' }}
+              - description: "Checked for GrantBirki/comment action usage in .github/workflows/ci.yml"
+                passed: ${{ steps.check-comment-action.outcome == 'success' }}
 
       # END: Check practical exercise
 
@@ -129,7 +128,6 @@ jobs:
 
   post_review_content:
     name: Post review content
-    if: github.event.pull_request.merged == true
     needs: [find_exercise, check_step_work]
     runs-on: ubuntu-latest
     env:
@@ -168,7 +166,6 @@ jobs:
 
   finish_exercise:
     name: Finish Exercise
-    if: github.event.pull_request.merged == true
     needs: [find_exercise, post_review_content]
     uses: skills/exercise-toolkit/.github/workflows/finish-exercise.yml@v0.8.1
     with:

@@ -16,20 +16,20 @@ jobs:
       node-version: "24"
 
   pages:
+    needs: quality
     name: Deploy to GitHub Pages
     permissions:
       contents: read
       pages: write
       id-token: write
-    needs: quality
     uses: ./.github/workflows/deploy-pages.yml
     with:
       node-version: "24"
 
   comment:
-    name: Comment on PR
-    if: always()
     needs: [quality, pages]
+    if: always()
+    name: Comment on PR
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
@@ -40,7 +40,6 @@ jobs:
           issue-number: ${{ github.event.pull_request.number }}
           body: |
             ✅ **Quality checks completed with status "${{ needs.quality.result }}"**
-
 
             **Workflow run:** https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}
 
