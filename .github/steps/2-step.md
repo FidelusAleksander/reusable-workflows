@@ -46,10 +46,9 @@ Let's start working on our CI workflow that will run on pull requests and call t
 
     ```
 
-  This workflow will run on every pull request change targeting `main` and will call the reusable workflow you created in the previous step.
+    This workflow will run on every pull request change targeting `main` and will call the reusable workflow you created in the previous step.
 
-
-  > ✨ A lot cleaner, isn't it? If your node quality checks are standardized across many repositories, you can call this reusable workflow from all of them and maintain it in one place!
+    > ✨ A lot cleaner, isn't it? If your node quality checks are standardized across many repositories, you can call this reusable workflow from all of them and maintain it in one place!
 
   1. Commit and push your `ci.yml` changes to the `reusable-workflows` branch.
 
@@ -60,7 +59,7 @@ Let's see your workflow running by opening a pull request!
 1. In another browser tab, navigate to the [Pull requests](https://github.com/{{ full_repo_name}}/pulls) section of your repository and open a new pull request from the `reusable-workflows` branch to `main`.
 1. As you scroll down, you will see the CI workflow running three separate jobs.
 
-1. 
+
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>

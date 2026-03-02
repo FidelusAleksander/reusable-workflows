@@ -40,49 +40,49 @@ Let's use that workflow and the output it generates to comment on the pull reque
 1. Open `.github/workflows/ci.yml`.
 1. Let's include another job in the `ci.yml` workflow that will call the `deploy-pages.yml` reusable workflow.
   
-  Add the following content to the end of `ci.yml` file:
+    Add the following content to the end of `ci.yml` file:
 
-  ```yaml
-    github-pages:
-      name: Deploy to GitHub Pages
-      needs: quality
-      uses: ./.github/workflows/deploy-pages.yml
-      with:
-        node-version: "24"
-      permissions:
-        contents: read
-        pages: write
-        id-token: write
-  ```
+    ```yaml
+      github-pages:
+        name: Deploy to GitHub Pages
+        needs: quality
+        uses: ./.github/workflows/deploy-pages.yml
+        with:
+          node-version: "24"
+        permissions:
+          contents: read
+          pages: write
+          id-token: write
+    ```
 
-  The `needs` keyword ensures this job will run only after the `quality` job succeeds.
-  
-  The `permissions` block is used to override and expand the permissions for this job beyond the default `contents: read` permissions set at the workflow level.
+    The `needs` keyword ensures this job will run only after the `quality` job succeeds.
+    
+    The `permissions` block is used to override and expand the permissions for this job beyond the default `contents: read` permissions set at the workflow level.
 
 1. Add another job that will use the `page_url` output of the `github-pages` job to comment on the pull request.
   
-   Add the following content to `ci.yml`:
+    Add the following content to `ci.yml`:
 
-  ```yaml
-    comment:
-      name: Comment on PR
-      if: always()
-      needs: github-pages
-      runs-on: ubuntu-latest
-      permissions:
-        pull-requests: write
-      steps:
-        - name: Comment with Pages URL
-          uses: GrantBirki/comment@v2.1.1
-          with:
-            issue-number: {% raw %}${{ github.event.pull_request.number }}{% endraw %}
-            body: |
-              🚀 **GitHub Pages URL:** {% raw %}${{ needs.github-pages.outputs.page_url }}{% endraw %}
+    ```yaml
+      comment:
+        name: Comment on PR
+        if: always()
+        needs: github-pages
+        runs-on: ubuntu-latest
+        permissions:
+          pull-requests: write
+        steps:
+          - name: Comment with Pages URL
+            uses: GrantBirki/comment@v2.1.1
+            with:
+              issue-number: {% raw %}${{ github.event.pull_request.number }}{% endraw %}
+              body: |
+                🚀 **GitHub Pages URL:** {% raw %}${{ needs.github-pages.outputs.page_url }}{% endraw %}
 
-              _[Workflow logs](https://github.com/{% raw %}${{ github.repository }}{% endraw %}/actions/runs/{% raw %}${{ github.run_id }}{% endraw %})_
-  ```
+                _[Workflow logs](https://github.com/{% raw %}${{ github.repository }}{% endraw %}/actions/runs/{% raw %}${{ github.run_id }}{% endraw %})_
+    ```
 
-  We set the `if: always()` condition to make sure the comment job runs even if the deployment fails, so we can have visibility on the workflow logs in that case.
+    The `if: always()` condition ensures that the comment job runs even if the deployment fails, so we can have visibility on the workflow logs in that case.
 
 ### ⌨️ Activity: Verify, commit and push your changes
 
@@ -90,17 +90,17 @@ We've done a lot of work in this step! The YAML indentation can be tricky, so le
 
 1. In your terminal, run the following command to check for any syntax errors in your `ci.yml` workflow file:
 
-   ```bash
-   actionlint .github/workflows/ci.yml
-   ```
+    ```bash
+    actionlint .github/workflows/ci.yml
+    ```
 
-  Or to check all workflow files:
+    Or to check all workflow files:
 
-  ```bash
-  actionlint
-  ```
+    ```bash
+    actionlint
+    ```
 
-  If there are any errors, fix them before proceeding.
+    If there are any errors, fix them before proceeding.
 
 1. Commit your `ci.yml` changes to the `reusable-workflows` branch.
 1. Monitor the `CI` workflow running on your pull request and wait for it to fully complete.
