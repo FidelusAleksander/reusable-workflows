@@ -32,6 +32,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      # TODO: Remove before publishing
+      # Temporary debug step
+      - run: echo "$FULL_CONTEXT"
+        env:
+          FULL_CONTEXT: ${{ toJSON(github) }}
+
       - name: Get response templates
         uses: actions/checkout@v6
         with:
