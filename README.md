@@ -5,8 +5,8 @@ _Build a reusable GitHub Actions workflow and call it from another workflow._
 ## Welcome
 
 - **Who is this for**: Developers and maintainers who want to reduce duplication in GitHub Actions pipelines.
-- **What you'll learn**: How to define `workflow_call` inputs and secrets, and how to invoke a reusable workflow from another workflow.
-- **What you'll build**: A small CI setup where one workflow centralizes shared logic and another workflow calls it.
+- **What you'll learn**: How to define and call reusable workflows, and how permissions flow across caller and nested reusable workflows.
+- **What you'll build**: A CI setup that runs reusable quality checks, deploys to GitHub Pages, and comments deployment details on pull requests.
 - **Prerequisites**:
   - Basic familiarity with GitHub Actions workflows
   - A GitHub account with permission to create repositories from templates
@@ -16,8 +16,8 @@ _Build a reusable GitHub Actions workflow and call it from another workflow._
 In this exercise, you will:
 
 1. Create a reusable workflow using `workflow_call`.
-1. Pass inputs/secrets from a caller workflow.
-1. Validate that workflow runs execute through the reusable entry point.
+1. Call that reusable workflow from a CI workflow.
+1. Add permissions-aware deployment and PR feedback jobs.
 
 ### How to start this exercise
 

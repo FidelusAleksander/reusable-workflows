@@ -17,37 +17,53 @@ When using a reusable workflow from another repository, pin `@ref` to a stable t
 
 ### ⌨️ Activity: Create a CI workflow and call your reusable workflow
 
-1. Open `.github/workflows/ci.yml`.
-1. Replace the file contents with this workflow:
+Let's start working on our CI workflow that will run on pull requests and call the reusable workflow you created in the previous step.
 
-   ```yaml
-   name: CI
+1. In your codespace, within the `.github/workflows` directory create a new workflow file named:
 
-   on:
-     pull_request:
-       branches:
-         - main
-
-   jobs:
-     quality:
-       uses: ./.github/workflows/reusable-node-quality.yml
-        with:
-          node-version: 24
+   ```text
+   ci.yml
    ```
 
-### ⌨️ Activity: Commit, push, and open a pull request
+1. Within that file copy the following workflow content:
 
-1. Commit your `ci.yml` changes to the `reusable-workflows` branch.
-1. Push the branch to GitHub.
-1. Open or update a pull request from `reusable-workflows` into `main`.
-1. Open the pull request **Checks** tab and confirm the CI workflow starts running.
-1. Wait for this step to be checked automatically.
+    ```yaml
+    name: CI
+
+    on:
+      pull_request:
+        branches:
+          - main
+
+    permissions:
+      contents: read
+
+    jobs:
+      quality:
+        uses: ./.github/workflows/reusable-node-quality.yml
+        with:
+          node-version: 24
+
+    ```
+
+  This workflow will run on every pull request change targeting `main` and will call the reusable workflow you created in the previous step.
+
+
+  > ✨ A lot cleaner, isn't it? If your node quality checks are standardized across many repositories, you can call this reusable workflow from all of them and maintain it in one place!
+
+  1. Commit and push your `ci.yml` changes to the `reusable-workflows` branch.
+
+### ⌨️ Activity: See your reusable workflow in action
+
+Let's see your workflow running by opening a pull request!
+
+1. In another browser tab, navigate to the [Pull requests](https://github.com/{{ full_repo_name}}/pulls) section of your repository and open a new pull request from the `reusable-workflows` branch to `main`.
+1. As you scroll down, you will see the CI workflow running three separate jobs.
+
+1. 
 
 <details>
 <summary>Having trouble? 🤷</summary><br/>
 
-- Keep `uses` directly under `jobs.<job_id>`.
-- Confirm the filename is `reusable-node-quality.yml`.
-- Make sure your pull request targets `main`.
 
 </details>

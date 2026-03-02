@@ -1,11 +1,11 @@
 name: Step 3
 
 on:
-  pull_request:
-    branches:
-      - main
+  workflow_run:
+    workflows:
+      - CI
     types:
-      - closed
+      - completed
 
 permissions:
   contents: write
@@ -22,16 +22,21 @@ jobs:
 
   check_step_work:
     name: Check step work
-    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     needs: [find_exercise]
     env:
       ISSUE_REPOSITORY: ${{ github.repository }}
-      ISSUE_NUMBER: ${{ needs.find_exercise.outputs['issue-number'] }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      # TODO: Remove before publishing
+      # Temporary debug step
+      - run: echo "$FULL_CONTEXT"
+        env:
+          FULL_CONTEXT: ${{ toJSON(github) }}
 
       - name: Get response templates
         uses: actions/checkout@v6
@@ -59,45 +64,42 @@ jobs:
 
       # START: Check practical exercise
 
-      - name: Check for node-version input in reusable workflow
-        id: check-node-input
-        continue-on-error: true
-        uses: skills/action-keyphrase-checker@v1
-        with:
-          text-file: .github/workflows/reusable-node-quality.yml
-          keyphrase: "node-version:"
-
-      - name: Check for coverage-percent output in reusable workflow
-        id: check-coverage-output
-        continue-on-error: true
-        uses: skills/action-keyphrase-checker@v1
-        with:
-          text-file: .github/workflows/reusable-node-quality.yml
-          keyphrase: "coverage-percent:"
-
-      - name: Check for coverage summary parsing
-        id: check-coverage-summary
-        continue-on-error: true
-        uses: skills/action-keyphrase-checker@v1
-        with:
-          text-file: .github/workflows/reusable-node-quality.yml
-          keyphrase: "coverage/coverage-summary.json"
-
-      - name: Check for node-version input passed in caller workflow
-        id: check-caller-input
+      - name: Check for github-pages job in caller workflow
+        id: check-deploy-pages-call
         continue-on-error: true
         uses: skills/action-keyphrase-checker@v1
         with:
           text-file: .github/workflows/ci.yml
-          keyphrase: "node-version:"
+          keyphrase: 'uses:\s*\.\/\.github\/workflows\/deploy-pages\.yml'
 
-      - name: Check for coverage output usage in caller workflow
-        id: check-caller-coverage-output
+      - name: Check for GrantBirki/comment action usage
+        id: check-comment-action
         continue-on-error: true
         uses: skills/action-keyphrase-checker@v1
         with:
           text-file: .github/workflows/ci.yml
-          keyphrase: "needs.quality.outputs.coverage-percent"
+          keyphrase: 'uses:\s*GrantBirki\/comment@v2\.1\.1'
+
+      - name: Check for at least three permissions blocks
+        id: check-permissions-block-count
+        continue-on-error: true
+        uses: skills/action-keyphrase-checker@v1
+        with:
+          text-file: .github/workflows/ci.yml
+          keyphrase: '^\s*permissions:\s*$'
+          minimum-occurrences: 3
+
+      - name: Check workflow_run conclusion
+        id: check-workflow-run-success-condition
+        continue-on-error: true
+        shell: bash
+        run: |
+          if [[ "${{ github.event.workflow_run.conclusion }}" == "success" ]]; then
+            echo "STEP_MESSAGE=Verified that CI workflow concluded with success." >> "$GITHUB_OUTPUT"
+          else
+            echo "STEP_MESSAGE=Your CI workflow run has failed." >> "$GITHUB_OUTPUT"
+            exit 1
+          fi
 
       - name: Update comment - step results
         uses: GrantBirki/comment@v2.1.1
@@ -110,16 +112,14 @@ jobs:
           vars: |
             step_number: 3
             results_table:
-              - description: "Checked for node-version input in reusable workflow"
-                passed: ${{ steps.check-node-input.outcome == 'success' }}
-              - description: "Checked for coverage-percent output in reusable workflow"
-                passed: ${{ steps.check-coverage-output.outcome == 'success' }}
-              - description: "Checked for coverage summary parsing in reusable workflow"
-                passed: ${{ steps.check-coverage-summary.outcome == 'success' }}
-              - description: "Checked for node-version input passed in .github/workflows/ci.yml"
-                passed: ${{ steps.check-caller-input.outcome == 'success' }}
-              - description: "Checked for coverage output usage in .github/workflows/ci.yml"
-                passed: ${{ steps.check-caller-coverage-output.outcome == 'success' }}
+              - description: "Checked that your CI workflow calls deploy-pages.yml"
+                passed: ${{ steps.check-deploy-pages-call.outcome == 'success' }}
+              - description: "Checked that your CI workflow uses GrantBirki/comment"
+                passed: ${{ steps.check-comment-action.outcome == 'success' }}
+              - description: "Checked that your CI workflow defines at least three permissions blocks"
+                passed: ${{ steps.check-permissions-block-count.outcome == 'success' }}
+              - description: ${{ steps.check-workflow-run-success-condition.outputs.STEP_MESSAGE }}
+                passed: ${{ steps.check-workflow-run-success-condition.outcome == 'success' }}
 
       # END: Check practical exercise
 
@@ -129,12 +129,11 @@ jobs:
 
   post_review_content:
     name: Post review content
-    if: github.event.pull_request.merged == true
     needs: [find_exercise, check_step_work]
     runs-on: ubuntu-latest
     env:
       ISSUE_REPOSITORY: ${{ github.repository }}
-      ISSUE_NUMBER: ${{ needs.find_exercise.outputs['issue-number'] }}
+      ISSUE_NUMBER: ${{ needs.find_exercise.outputs.issue-number }}
 
     steps:
       - name: Checkout
@@ -168,9 +167,8 @@ jobs:
 
   finish_exercise:
     name: Finish Exercise
-    if: github.event.pull_request.merged == true
     needs: [find_exercise, post_review_content]
     uses: skills/exercise-toolkit/.github/workflows/finish-exercise.yml@v0.8.1
     with:
-      issue-url: ${{ needs.find_exercise.outputs['issue-url'] }}
+      issue-url: ${{ needs.find_exercise.outputs.issue-url }}
       exercise-title: "Create and use reusable workflows"

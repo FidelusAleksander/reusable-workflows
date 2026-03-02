@@ -8,10 +8,12 @@ Here's a recap of your accomplishments:
 
 - Created a reusable workflow using `workflow_call`
 - Called that reusable workflow from a standard CI workflow
-- Added an input to make the reusable workflow configurable
+- Understood permissions flow across caller and nested reusable workflows
+- Expanded your CI workflow to deploy to GitHub Pages and comment on pull requests with deployment details
 
 ### What's next?
 
-- Explore [GitHub Skills: Test with Actions](https://github.com/skills/test-with-actions)
-- Read [Reusing workflows](https://docs.github.com/actions/using-workflows/reusing-workflows)
-- Try extracting a repeated workflow from one of your own repositories
+- Continue with more [GitHub Skills](https://learn.github.com/skills) exercises:
+  - Build automations with [AI in Actions](https://github.com/skills/ai-in-actions)
+  - Learn more about [GitHub Pages](https://github.com/skills/github-pages)
+  - Create your own action in [Write JavaScript Actions](https://github.com/skills/write-javascript-actions)

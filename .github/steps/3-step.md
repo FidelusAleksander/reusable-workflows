@@ -1,27 +1,107 @@
-## Step 3: Add inputs and outputs
+## Step 3: Add permissions-aware deployment and PR feedback
 
-In this final step, you will make your reusable workflow configurable and return useful data back to the caller.
+Great progress! You already call your reusable quality workflow from `ci.yml`.
 
-### 📖 Theory: Inputs and outputs in reusable workflows
+In this final step, you'll expand your CI workflow with more functionalities that will require you to understand workflow permissions.
 
-Inputs define values the caller can pass into the reusable workflow using `with`. Outputs define values the reusable workflow returns to the caller after execution.
+Also we will deploy **Octomatch** to GitHub Pages!
 
-A common pattern is to expose a summary value from tests, then use it in a follow-up job in the caller workflow.
+### 📖 Theory: How permissions pass to reusable workflows
 
-### ⌨️ Activity: Pass `node-version` and publish `coverage-percent`
+When a workflow calls a reusable workflow, token permissions are inherited and can only stay the same or become more restrictive.
 
-1. Open `.github/workflows/reusable-node-quality.yml`.
-1. In `on.workflow_call`, ensure there is an input named `node-version` and add a workflow output named `coverage-percent`.
-1. In the tests job, capture coverage percent from the coverage summary file and map it to a job output.
-1. Open `.github/workflows/ci.yml` and, in the caller job, pass `node-version` with `with:`.
-1. Add a follow-up job that reads `{% raw %}${{ needs.quality.outputs.coverage-percent }}{% endraw %}` and posts it in a pull request comment.
-1. Merge the pull request into `main` to finish the exercise.
+Reusable workflows can be nested and each level inherits from its direct caller, not from the original top-level workflow.
 
-<details>
-<summary>Having trouble? 🤷</summary><br/>
+| Where permissions are set      | What it controls                                                                 | Can permissions be expanded here? |
+| ------------------------------ | -------------------------------------------------------------------------------- | --------------------------------- |
+| Caller workflow (`ci.yml`)     | The permission ceiling available to all called workflows and their jobs          | Yes (sets the upper limit)        |
+| Called reusable workflow       | How permissions are scoped for its own jobs and any downstream reusable calls    | No, only same or narrower         |
+| Nested reusable workflow calls | The inherited permission ceiling passed from the direct parent reusable workflow | No, only same or narrower         |
 
-- Workflow outputs in `workflow_call` must map to job-level outputs.
-- Caller jobs can read reusable workflow outputs with `needs.<job-id>.outputs.<name>`.
-- If you post a pull request comment, ensure the job has `pull-requests: write` permission.
+### ⌨️ Activity: Enable Github Pages for the repository
 
-</details>
+In the following activity we will expand the `ci` workflow that will deploy **Octomatch** to GitHub Pages. Before we can do that, we need to enable GitHub Pages for this repository.
+
+1. Go to your repository [settings](https://github.com/{{ full_repo_name }}/settings).
+1. In the left sidebar click on `Pages`
+1. Under `Source` select `GitHub Actions`
+
+    <img width="900" alt="image showing GitHub Pages settings" src="../images/pages-settings.png" />
+
+  Now you are ready to add a deployment job to your workflow that will deploy the app to GitHub Pages on every pull request!
+
+
+### ⌨️ Activity: Add deployment and PR comment jobs to your workflow
+
+A reusable workflow called `deploy-pages.yml` is already present in the `.github/workflows` directory. It deploys the app to GitHub Pages and outputs the page URL.
+
+Let's use that workflow and the output it generates to comment on the pull request with the deployed page URL every time the workflow runs.
+
+1. Open `.github/workflows/ci.yml`.
+1. Let's include another job in the `ci.yml` workflow that will call the `deploy-pages.yml` reusable workflow.
+  
+  Add the following content to the end of `ci.yml` file:
+
+  ```yaml
+    github-pages:
+      name: Deploy to GitHub Pages
+      needs: quality
+      uses: ./.github/workflows/deploy-pages.yml
+      with:
+        node-version: "24"
+      permissions:
+        contents: read
+        pages: write
+        id-token: write
+  ```
+
+  The `needs` keyword ensures this job will run only after the `quality` job succeeds.
+  
+  The `permissions` block is used to override and expand the permissions for this job beyond the default `contents: read` permissions set at the workflow level.
+
+1. Add another job that will use the `page_url` output of the `github-pages` job to comment on the pull request.
+  
+   Add the following content to `ci.yml`:
+
+  ```yaml
+    comment:
+      name: Comment on PR
+      if: always()
+      needs: github-pages
+      runs-on: ubuntu-latest
+      permissions:
+        pull-requests: write
+      steps:
+        - name: Comment with Pages URL
+          uses: GrantBirki/comment@v2.1.1
+          with:
+            issue-number: {% raw %}${{ github.event.pull_request.number }}{% endraw %}
+            body: |
+              🚀 **GitHub Pages URL:** {% raw %}${{ needs.github-pages.outputs.page_url }}{% endraw %}
+
+              _[Workflow logs](https://github.com/{% raw %}${{ github.repository }}{% endraw %}/actions/runs/{% raw %}${{ github.run_id }}{% endraw %})_
+  ```
+
+  We set the `if: always()` condition to make sure the comment job runs even if the deployment fails, so we can have visibility on the workflow logs in that case.
+
+### ⌨️ Activity: Verify, commit and push your changes
+
+We've done a lot of work in this step! The YAML indentation can be tricky, so let's first use `actionlint` to verify there are no syntax errors in our workflow files!
+
+1. In your terminal, run the following command to check for any syntax errors in your `ci.yml` workflow file:
+
+   ```bash
+   actionlint .github/workflows/ci.yml
+   ```
+
+  Or to check all workflow files:
+
+  ```bash
+  actionlint
+  ```
+
+  If there are any errors, fix them before proceeding.
+
+1. Commit your `ci.yml` changes to the `reusable-workflows` branch.
+1. Monitor the `CI` workflow running on your pull request and wait for it to fully complete.
+1. Once it's done you should see a new comment on your pull request with the GitHub Pages URL where you can play **Octomatch**!
